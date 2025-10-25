@@ -163,4 +163,43 @@ class User {
     public function getEmail(): string {
         return $this->email;
     }
+
+    public function getSignInDate() : string{
+        $pdo = Database::getConnexion();
+
+        // 📚 Recherche de l'utilisateur par email
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$this->id]);
+        $ligne = $stmt->fetch();
+
+        // 📚 CONCEPT SÉCURITÉ : Vérification du mot de passe hashé
+        // password_verify() compare le mot de passe en clair avec le hash
+        // JAMAIS de comparaison directe (==) !
+        // password_verify() gère automatiquement le sel et l'algorithme
+
+        if ($ligne) {
+            // ✅ Authentification réussie
+            // On crée et retourne un objet User
+            return $ligne["created_at"];
+        }
+
+        // ❌ Email inexistant ou mot de passe incorrect
+        return null;
+    }
+
+    public function updateUsername(string $newUsername) : void{
+        $pdo = Database::getConnexion();
+
+        // 📚 Recherche de l'utilisateur par email
+        $stmt = $pdo->prepare("
+            UPDATE users
+            SET pseudo=?
+            WHERE id=?
+        ");
+        // 📚 CONCEPT SÉCURITÉ : Vérification du mot de passe hashé
+        // password_verify() compare le mot de passe en clair avec le hash
+        // JAMAIS de comparaison directe (==) !
+        // password_verify() gère automatiquement le sel et l'algorithme
+        $stmt->execute([$newUsername,$this->id]);
+    }
 }

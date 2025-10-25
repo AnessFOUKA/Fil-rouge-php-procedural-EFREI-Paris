@@ -138,7 +138,14 @@ function afficherDifficulte($niveau) {
                         <span class="text-4xl"><?php echo $quiz['emoji']; ?></span>
                         <!-- 📚 NOTE : On pourrait afficher le nombre de questions depuis la BDD -->
                         <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">
-                            5 questions
+                            <?php $stmt = $pdo->query("
+                                SELECT questionnaire_id, COUNT(*) as nb_questions
+                                FROM questions
+                                GROUP BY questionnaire_id
+                            ");
+                            $questionnaires = $stmt->fetchAll();
+                            echo isset($questionnaires[$quiz["id"] - 1]) ? $questionnaires[$quiz["id"]-1]["nb_questions"] : 0;
+                            ?>
                         </span>
                     </div>
                     <h3 class="text-2xl font-bold mb-2"><?php echo htmlspecialchars($quiz['titre']); ?></h3>
